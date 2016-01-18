@@ -1,0 +1,151 @@
+#######################################################################
+#                           Template Snippets                         #
+#######################################################################
+
+snippet temptest "Template for a C# Unit Test class" b
+using System;
+using NUnit.Framework;
+
+namespace ${1:Tests}
+{
+	[TestFixture]
+	public class $2Tests
+	{
+     // Shortcut: fix
+
+    // Shortcut: test
+	}
+}
+endsnippet
+
+snippet kclient "Using statement for RSAPI client" b
+using (var client = this.Helper.GetServicesManager().CreateProxy<kCura.Relativity.Client.IRSAPIClient>(Relativity.API.ExecutionIdentity.$ExecutionIdentity$))
+{
+	//Set the workspace artifactID from the job.
+    client.APIOptions.WorkspaceID = workspaceArtifactID;
+
+    $1
+}
+endsnippet
+
+snippet kc "Create DTO" b
+var dto = new kCura.Relativity.Client.DTOs.${1:Type}();
+
+//Only need ArtifactType for RDOs
+dto.ArtifactTypeGuids.Add(${2:artifactTypeGuid});
+
+Int32 newArtifactID;
+
+//TODO: add fields to set using snippets AddFieldValuetoFields. Shortcut: kaf
+$3
+
+var result = client.Repositories.$1.Create(dto);
+if (result.Success)
+{
+  newArtifactID = result.Results.FirstOrDefault().Artifact.ArtifactID;
+}
+else
+{
+  var messageList = new StringBuilder();
+  messageList.AppendLine(result.Message);
+  result.Results.ToList().ForEach(w => messageList.AppendLine(w.Message));
+  throw new Exception(messageList.ToString());
+}
+endsnippet
+
+snippet kd "Delete DTO" b
+var dto = new kCura.Relativity.Client.DTOs.${1:Type}(${2:recordArtifactID});
+
+//Only need ArtifactType for RDOs
+dto.ArtifactTypeGuids.Add(${3:artifactTypeGuid});
+
+var result = client.Repositories.$1.Delete(dto);
+if (!result.Success)
+{
+  var messageList = new StringBuilder();
+  messageList.AppendLine(result.Message);
+  result.Results.ToList().ForEach(w => messageList.AppendLine(w.Message));
+  throw new Exception(messageList.ToString());
+}
+endsnippet
+
+
+snippet kiapi "Instantiation of the IAPI" b
+// Note: Must manually add ImportAPI assembly to your project.  May be found at this file location:
+// C:\Program Files\kCura Corporation\Relativity SDK\ImportAPI\Client\x64\kCura.Relativity.ImportAPI.dll
+
+String relativityUsername = "${1:username}";
+String relativityPassword = "${2:password}";
+String relativityWebApiUrl = "http://${3:machine}/Relativitywebapi/";
+
+ImportAPI ${4:iapi} = new ImportAPI(relativityUsername, relativityPassword, relativityWebApiUrl);
+endsnippet
+
+snippet kimport "Template for importing documents using the IAPI" b
+// Note: Must manually add the following assemblies to your project.  May be found at this file location:
+// C:\Program Files\kCura Corporation\Relativity SDK\ImportAPI\Client\x64\kCura.Relativity.ImportAPI.dll
+// C:\Program Files\kCura Corporation\Relativity SDK\ImportAPI\Client\x64\kCura.Relativity.DataReaderClient.dll
+
+// TODO: Create Import API object (Shortcut: kiapi)
+
+var importJob = ${1:iapi}.NewNativeDocumentImportJob();
+
+// TODO: Add additional event handler code to the import job (Shortcut: keh)
+
+// Event Handlers
+importJob.OnMessage += ImportJobOnMessage;
+importJob.OnComplete += ImportJobOnComplete;
+importJob.OnFatalException += ImportJobOnFatalException;
+
+// Settings
+importJob.Settings.CaseArtifactId = ${2:workspaceArtifactID};
+importJob.Settings.ExtractedTextFieldContainsFilePath = ${3:containsFilePath};
+importJob.Settings.NativeFilePathSourceFieldName = "${4:sourceFieldName}";
+importJob.Settings.ParentObjectIdSourceFieldName = "${5:parentDocumentID}";
+importJob.Settings.SelectedIdentifierFieldName = "${6:identifierFieldName}";
+importJob.Settings.IdentityFieldId = ${7:identityFieldArtifactID};
+importJob.Settings.NativeFileCopyMode = NativeFileCopyModeEnum.${8:copyMode};
+importJob.Settings.OverwriteMode = OverwriteModeEnum.${9:overwriteMode};
+
+// TODO: Create method that creates a data table for the document (Shortcut: kdt)
+
+importJob.SourceData.SourceData = GetDocumentDataTable().CreateDataReader();
+
+importJob.Execute();
+endsnippet
+
+snippet kdt "Add Method to Get Document DataTable" b
+public DataTable GetDocumentDataTable()
+{
+    var table = new DataTable();
+
+    // Add any columns that you want to import into Relativity.
+    // Below are some standard columns, but only the first is required.
+    table.Columns.Add("${1:identifierFieldName}", typeof(string));
+    table.Columns.Add("Native File", typeof(string));
+    table.Columns.Add("Parent Document ID", typeof(string));
+    $2
+
+    return table;
+}
+endsnippet
+
+snippet keh "Add Event Handler code for IAPI" b
+// Note: Must manually add ImportAPI assembly to your project.  May be found at this file location:
+// C:\Program Files\kCura Corporation\Relativity SDK\ImportAPI\Client\x64\kCura.Relativity.ImportAPI.dll
+
+static void ImportJobOnMessage(Status status)
+{
+    Console.WriteLine("Message: {0}", status.Message);
+}
+
+static void ImportJobOnFatalException(JobReport jobReport)
+{
+    Console.WriteLine("Fatal Error: {0}", jobReport.FatalException);
+}
+
+static void ImportJobOnComplete(JobReport jobReport)
+{
+    Console.WriteLine("Job Finished With {0} Errors: ", jobReport.ErrorRowCount);
+}
+endsnippet

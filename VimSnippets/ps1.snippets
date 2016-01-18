@@ -1,0 +1,11 @@
+###################################
+#      Powershell Snippets        #
+###################################
+
+snippet msbuild "Insert common msbuild command" b
+msbuild /nologo /v:Quiet /t:Build ${1:Path}
+endsnippet
+
+snippet test "Insert common nunit-console command" b
+test /nologo /noresult /labels ${1:Path}
+endsnippet

@@ -1,0 +1,69 @@
+###################################
+#         SQL Snippets            #
+###################################
+
+snippet sqls "SELECT Statement" b
+SELECT *
+FROM [EDDSDBO].[$1] WITH [NOLOCK]
+endsnippet
+
+snippet sqlj "SELECT with INNER JOIN Statement" b
+SELECT *
+FROM [EDDSDBO].[$1] ${2:A}  WITH [NOLOCK]
+INNER JOIN [EDDSDBO].[$3] ${4:B}
+ON $2.[${5:ArtifactID}] = $4.[${6:ArtifactID}]
+endsnippet
+
+snippet sqlw "WHERE Statement" b
+WHERE [$1] = $2
+endsnippet
+
+snippet sqld "DECLARE Statement" b
+DECLARE @${2:Var} AS ${1:INT}
+endsnippet
+
+snippet sqli "INSERT Statement" b
+INSERT INTO [EDDSDBO].[$1]
+(
+[$2]
+)
+VALUES
+(
+$3
+)
+endsnippet
+
+snippet sqln "Check for NULL" b
+IF object_id(N'${1:ObjectName}') IS NOT NULL
+BEGIN
+$2
+END
+endsnippet
+
+snippet sqlf "CREATE FUNCTION Statement" b
+CREATE FUNCTION [EDDSDBO].${1:FunctionName}
+( @${2:Param1} ${3:INT} )
+RETURNS ${4:INT} AS
+BEGIN
+  -- include DECLARE with sqld
+$5
+  -- Don't forget to RETURN
+END
+endsnippet
+
+snippet sqldy "Wrap Dynamic Sql" b
+DECLARE @Sql AS NVARCHAR(MAX)
+
+SET @Sql = N'
+${VISUAL}$1
+'
+EXECUTE(@Sql)
+endsnippet
+
+snippet sqlt "CREATE TABLE Statement (temp)" b
+CREATE TABLE #${1:TempTable}
+(
+[ID] INT NOT NULL IDENTITY(1,1),
+  [$2] ${3:INT}
+)
+endsnippet

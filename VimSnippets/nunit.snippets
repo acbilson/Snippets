@@ -1,0 +1,40 @@
+
+###################################
+#         NUnit Snippets          #
+###################################
+
+snippet fix "NUnit Test Fixture" b
+[${1:Setup}Fixture]
+public void $1()
+{
+$2
+}
+endsnippet
+
+snippet test "NUnit Test" b
+public void ${1:Method}_${2:Receives}_${3:Effect}()
+{
+//Arrange
+$4
+//Act
+$5
+//Assert
+$6
+}
+endsnippet
+
+snippet ae "NUnit Assert AreEqual" b
+Assert.AreEqual(${1:expected}, ${2:actual});
+endsnippet
+
+snippet at "NUnit Assert True" b
+Assert.IsTrue(${2:actual});
+endsnippet
+
+snippet af "NUnit Assert False" b
+Assert.IsFalse(${2:actual});
+endsnippet
+
+snippet ath "NUnit Assert Throws" b
+Assert.Throws<${1:Exception}>(() => $2);
+endsnippet
